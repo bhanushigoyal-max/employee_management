@@ -1,0 +1,333 @@
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.labelRequired::after {
+  content: '*';
+  color: var(--error);
+}
+
+.input, .select, .textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.inputError, .selectError, .textareaError {
+  border-color: var(--error);
+}
+
+.inputError:focus, .selectError:focus, .textareaError:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.errorMessage {
+  color: var(--error);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: slideIn 0.2s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.radioGroup, .checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.radioLabel, .checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.radioLabel:hover, .checkboxLabel:hover {
+  color: var(--text-primary);
+}
+
+.radioInput, .checkboxInput {
+  accent-color: var(--primary);
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.fileUploadArea {
+  border: 2px dashed var(--input-border);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  text-align: center;
+  background: var(--input-bg);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.fileUploadArea:hover {
+  border-color: var(--primary);
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.fileUploadAreaError {
+  border-color: var(--error);
+}
+
+.uploadIcon {
+  color: var(--primary);
+  width: 32px;
+  height: 32px;
+}
+
+.uploadText {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.uploadText span {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.previewContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.imagePreview {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 2px solid var(--input-border);
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fileName {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.fileSize {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.removeFileBtn {
+  color: var(--error);
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-top: 0.25rem;
+}
+
+.removeFileBtn:hover {
+  text-decoration: underline;
+}
+
+/* Custom Multiselect */
+.multiSelectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.multiSelectContainer {
+  position: relative;
+  width: 100%;
+}
+
+.multiSelectTrigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3rem;
+  padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+}
+
+.multiSelectChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  flex: 1;
+  align-items: center;
+}
+
+.multiSelectChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.chipRemoveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0.7;
+}
+
+.chipRemoveBtn:hover {
+  opacity: 1;
+}
+
+.multiSelectPlaceholder {
+  color: var(--text-secondary);
+  padding-left: 0.5rem;
+}
+
+.multiSelectActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.clearAllBtn {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.clearAllBtn:hover {
+  color: var(--error);
+}
+
+.separator {
+  width: 1px;
+  height: 16px;
+  background: var(--input-border);
+}
+
+.dropdownIcon {
+  color: var(--text-secondary);
+}
+
+.noOptions {
+  padding: 0.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.searchInputWrapper {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--input-border);
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.searchIcon {
+  color: var(--text-secondary);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.25rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.selectedOption {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.multiSelectDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  padding: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.multiSelectOption {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  color: var(--text-primary);
+}
+
+.multiSelectOption:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

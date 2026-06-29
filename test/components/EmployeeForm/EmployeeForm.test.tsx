@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { EmployeeForm } from '../../../src/components/EmployeeForm/EmployeeForm';
 import { MESSAGES } from '../../../src/lang/messages';

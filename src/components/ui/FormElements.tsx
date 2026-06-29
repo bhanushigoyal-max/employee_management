@@ -132,7 +132,7 @@ export const CheckboxRadioGroup: React.FC<CheckboxRadioProps> = ({ label, name, 
 type FileUploadProps = BaseProps & {
   register: UseFormRegister<any>;
   accept: string;
-  watchFile: FileList | null;
+  watchFile: FileList | string | null;
   onClear: () => void;
   isImage?: boolean;
 };
@@ -141,18 +141,18 @@ type FileUploadProps = BaseProps & {
  * File Upload Component with drag-and-drop support and preview generation.
  * Handles both newly uploaded files and existing files (represented as string URLs).
  */
-export const FileUpload: React.FC<FileUploadProps> = ({ 
-  label, name, error, required, register, accept, watchFile, onClear, isImage 
+export const FileUpload: React.FC<FileUploadProps> = ({
+  label, name, error, required, register, accept, watchFile, onClear, isImage
 }) => {
   const isExistingString = typeof watchFile === 'string';
   const file = isExistingString ? null : watchFile?.[0];
   const hasFile = isExistingString || !!file;
-  
+
   let previewUrl = '';
   let fileName = '';
   let fileSize = '';
-  
-  if (isExistingString) {
+
+  if (isExistingString && watchFile) {
     fileName = watchFile.split('/').pop()?.split('\\').pop() || 'Existing File';
     fileSize = 'Existing';
     if (isImage) {
@@ -162,11 +162,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     fileName = file.name;
     fileSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
     if (isImage) {
-      try {
-        previewUrl = URL.createObjectURL(file);
-      } catch (e) {
-        // Ignore
-      }
+      previewUrl = URL.createObjectURL(file);
     }
   }
 
@@ -175,7 +171,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       <label className={`${styles.label} ${required ? styles.labelRequired : ''}`}>
         {label}
       </label>
-      
+
       {!hasFile ? (
         <label className={`${styles.fileUploadArea} ${error ? styles.fileUploadAreaError : ''}`}>
           <UploadCloud className={styles.uploadIcon} />
@@ -207,7 +203,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </div>
         </div>
       )}
-      
+
       {error && (
         <span className={styles.errorMessage}>
           <AlertCircle size={14} /> {error.message as string}
@@ -226,7 +222,7 @@ type MultiSelectProps = BaseProps & {
 export const MultiSelectDropdown: React.FC<MultiSelectProps> = ({ label, name, error, required, watch, setValue, options }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const selectedValues: string[] = watch(name) || [];
-  
+
   const handleSelect = (val: string) => {
     if (!selectedValues.includes(val)) {
       setValue(name, [...selectedValues, val], { shouldValidate: true, shouldDirty: true });
@@ -251,9 +247,9 @@ export const MultiSelectDropdown: React.FC<MultiSelectProps> = ({ label, name, e
       <label className={`${styles.label} ${required ? styles.labelRequired : ''}`}>
         {label}
       </label>
-      
+
       <div className={styles.multiSelectContainer}>
-        <div 
+        <div
           className={`${styles.input} ${styles.multiSelectTrigger} ${error ? styles.inputError : ''}`}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -274,7 +270,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectProps> = ({ label, name, e
               <span className={styles.multiSelectPlaceholder}>Select {label}</span>
             )}
           </div>
-          
+
           <div className={styles.multiSelectActions}>
             {selectedValues.length > 0 && (
               <button type="button" onClick={handleClearAll} className={styles.clearAllBtn}>
@@ -285,13 +281,13 @@ export const MultiSelectDropdown: React.FC<MultiSelectProps> = ({ label, name, e
             <ChevronDown size={16} className={styles.dropdownIcon} />
           </div>
         </div>
-        
+
         {isOpen && (
           <div className={styles.multiSelectDropdown}>
             {unselectedOptions.length > 0 ? (
               unselectedOptions.map((opt) => (
-                <div 
-                  key={opt.value} 
+                <div
+                  key={opt.value}
                   className={styles.multiSelectOption}
                   onClick={() => handleSelect(opt.value)}
                 >
@@ -329,9 +325,9 @@ type SearchableSelectProps = BaseProps & {
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({ label, name, error, required, options, setValue, watch, placeholder, disabled }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
-  
+
   const wrapperRef = React.useRef<HTMLDivElement>(null);
-  
+
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -358,9 +354,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({ label, name,
       <label className={`${styles.label} ${required ? styles.labelRequired : ''}`}>
         {label}
       </label>
-      
+
       <div className={styles.multiSelectContainer}>
-        <div 
+        <div
           className={`${styles.input} ${styles.multiSelectTrigger} ${error ? styles.inputError : ''} ${disabled ? styles.inputDisabled : ''}`}
           onClick={() => !disabled && setIsOpen(!isOpen)}
           style={{ opacity: disabled ? 0.6 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
@@ -370,13 +366,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({ label, name,
           </span>
           <ChevronDown size={16} className={styles.dropdownIcon} />
         </div>
-        
+
         {isOpen && (
           <div className={styles.multiSelectDropdown}>
             <div className={styles.searchInputWrapper}>
               <Search size={14} className={styles.searchIcon} />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 className={styles.searchInput}
                 placeholder="Search..."
                 value={search}
@@ -387,8 +383,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({ label, name,
             </div>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((opt) => (
-                <div 
-                  key={opt.value} 
+                <div
+                  key={opt.value}
                   className={`${styles.multiSelectOption} ${opt.value === selectedValue ? styles.selectedOption : ''}`}
                   onClick={() => handleSelect(opt.value)}
                 >

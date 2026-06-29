@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { EmployeeList } from '../../../src/components/EmployeeList/EmployeeList';
 import { MESSAGES } from '../../../src/lang/messages';

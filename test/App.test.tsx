@@ -1,7 +1,5 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import App from '../src/App';
-import { api } from '../src/utils/api';
 import { MESSAGES } from '../src/lang/messages';
 
 jest.mock('../src/utils/api', () => ({

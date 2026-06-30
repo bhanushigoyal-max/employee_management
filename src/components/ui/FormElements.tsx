@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { UseFormRegister, FieldError, Merge, FieldErrorsImpl, UseFormWatch } from 'react-hook-form';
 import { UploadCloud, FileText, AlertCircle, ChevronDown, X, Search, Image as ImageIcon } from 'lucide-react';
 import { getFileUrl } from '../../utils/fileUtils';
@@ -176,7 +176,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         <label className={`${styles.fileUploadArea} ${error ? styles.fileUploadAreaError : ''}`}>
           <UploadCloud className={styles.uploadIcon} />
           <div className={styles.uploadText}>
-            <span>Click to upload</span> or drag and drop
+            Click to upload
           </div>
           <input
             type="file"
@@ -217,11 +217,24 @@ type MultiSelectProps = BaseProps & {
   watch: UseFormWatch<any>;
   setValue: any;
   options: { value: string; label: string }[];
+  disabled?: boolean;
 };
 
-export const MultiSelectDropdown: React.FC<MultiSelectProps> = ({ label, name, error, required, watch, setValue, options }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
+export const MultiSelectDropdown: React.FC<MultiSelectProps> = ({ label, name, error, required, watch, setValue, options, disabled }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const selectedValues: string[] = watch(name) || [];
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSelect = (val: string) => {
     if (!selectedValues.includes(val)) {
@@ -243,15 +256,16 @@ export const MultiSelectDropdown: React.FC<MultiSelectProps> = ({ label, name, e
   const unselectedOptions = options.filter(opt => !selectedValues.includes(opt.value));
 
   return (
-    <div className={styles.formGroup}>
+    <div className={styles.formGroup} ref={wrapperRef}>
       <label className={`${styles.label} ${required ? styles.labelRequired : ''}`}>
         {label}
       </label>
 
       <div className={styles.multiSelectContainer}>
         <div
-          className={`${styles.input} ${styles.multiSelectTrigger} ${error ? styles.inputError : ''}`}
-          onClick={() => setIsOpen(!isOpen)}
+          className={`${styles.input} ${styles.multiSelectTrigger} ${error ? styles.inputError : ''} ${disabled ? styles.inputDisabled : ''}`}
+          onClick={() => !disabled && setIsOpen(!isOpen)}
+          style={{ opacity: disabled ? 0.6 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
         >
           <div className={styles.multiSelectChips}>
             {selectedValues.length > 0 ? (
@@ -323,12 +337,12 @@ type SearchableSelectProps = BaseProps & {
  * Useful for long lists like Countries, States, and Cities.
  */
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({ label, name, error, required, options, setValue, watch, placeholder, disabled }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
 
-  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);

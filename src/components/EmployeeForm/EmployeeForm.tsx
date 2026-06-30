@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
@@ -11,14 +11,6 @@ import { API } from '../../utils/apiPaths';
 import { MESSAGES } from '../../lang/messages';
 import styles from './EmployeeForm.module.css';
 
-const SKILLS_OPTIONS = [
-  { value: 'React', label: 'React' },
-  { value: 'Node.js', label: 'Node.js' },
-  { value: 'MongoDB', label: 'MongoDB' },
-  { value: 'Express.js', label: 'Express.js' },
-  { value: 'TypeScript', label: 'TypeScript' },
-  { value: 'AWS', label: 'AWS' },
-];
 
 const PREFERRED_MODE_OPTIONS = [
   { value: 'Work From Office', label: 'Work From Office' },
@@ -64,6 +56,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSucce
   const [countries, setCountries] = useState<{ value: string, label: string }[]>([]);
   const [states, setStates] = useState<{ value: string, label: string }[]>([]);
   const [cities, setCities] = useState<{ value: string, label: string }[]>([]);
+  const [skillsOptions, setSkillsOptions] = useState<{ value: string, label: string }[]>([]);
 
   // Form configuration using react-hook-form and Zod validation
   const {
@@ -89,6 +82,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSucce
   const watchResume = watch('resume');
   const watchCountry = watch('country');
   const watchState = watch('state');
+  const watchDepartment = watch('department');
 
   // Fetch Countries on Mount
   useEffect(() => {
@@ -108,7 +102,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSucce
     fetchCountries();
   }, []);
 
-  const prevCountryRef = React.useRef(watchCountry);
+  const prevCountryRef = useRef(watchCountry);
 
   // Fetch States when Country changes
   useEffect(() => {
@@ -140,7 +134,40 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSucce
     prevCountryRef.current = watchCountry;
   }, [watchCountry, countries, setValue]);
 
-  const prevStateRef = React.useRef(watchState);
+  const prevDepartmentRef = useRef(watchDepartment);
+
+  // Fetch Skills when Department changes
+  useEffect(() => {
+    if (watchDepartment) {
+      const fetchSkills = async () => {
+        try {
+          const result = await api.get(`${API.GET_DEPARTMENT_SKILLS}?department=${encodeURIComponent(watchDepartment)}`);
+          const dataArr = Array.isArray(result.data?.data) ? result.data.data : (Array.isArray(result.data) ? result.data : []);
+
+          const mapped = dataArr.map((item: any) => {
+            const skillName = typeof item === 'string' ? item : (item.name || item.value || item.label || item);
+            return { value: skillName, label: skillName };
+          });
+
+          setSkillsOptions(mapped);
+        } catch (e: any) {
+          if (e?.message) toast.error(e.message);
+          setSkillsOptions([]);
+        }
+      };
+      fetchSkills();
+    } else {
+      setSkillsOptions([]);
+    }
+
+    // Clear selected skills when department changes
+    if (prevDepartmentRef.current && prevDepartmentRef.current !== watchDepartment) {
+      setValue('skills', [], { shouldValidate: true });
+    }
+    prevDepartmentRef.current = watchDepartment;
+  }, [watchDepartment, setValue]);
+
+  const prevStateRef = useRef(watchState);
 
   // Fetch Cities when State changes
   useEffect(() => {
@@ -271,6 +298,7 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSucce
           register={register}
           error={errors.email}
           required
+          maxLength={50}
           placeholder={MESSAGES.FORM.PLACEHOLDERS.EMAIL}
         />
 
@@ -325,11 +353,12 @@ export const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialData, onSucce
           <MultiSelectDropdown
             label={MESSAGES.FORM.LABELS.SKILLS}
             name="skills"
-            options={SKILLS_OPTIONS}
+            options={skillsOptions}
             watch={watch}
             setValue={setValue}
             error={errors.skills}
             required
+            disabled={!watchDepartment}
           />
         </div>
 

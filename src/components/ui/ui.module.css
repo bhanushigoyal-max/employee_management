@@ -273,7 +273,7 @@
   border-bottom: 1px solid var(--input-border);
   position: sticky;
   top: 0;
-  background: var(--bg-surface);
+  background: var(--bg-color);
   z-index: 2;
   display: flex;
   align-items: center;
@@ -305,16 +305,14 @@
   top: calc(100% + 4px);
   left: 0;
   width: 100%;
-  background: var(--input-bg);
+  background: var(--bg-color);
   border: 1px solid var(--input-border);
   border-radius: var(--radius-sm);
   max-height: 200px;
   overflow-y: auto;
-  z-index: 10;
+  z-index: 50;
   padding: 0.5rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .multiSelectOption {

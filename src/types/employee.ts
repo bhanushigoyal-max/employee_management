@@ -21,6 +21,7 @@ export const EmployeeSchema = z.object({
     .string()
     .trim()
     .min(1, "Email is required")
+    .max(50, "Email cannot exceed 50 characters")
     .email("Invalid email address"),
 
   mobile: z

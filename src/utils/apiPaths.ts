@@ -8,4 +8,7 @@ export const API = {
 
   // Auth APIs
   GET_TOKEN: "/auth/token",
+
+  // Skills
+  GET_DEPARTMENT_SKILLS: "/employees/skills/department",
 };

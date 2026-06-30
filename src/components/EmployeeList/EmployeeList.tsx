@@ -21,6 +21,8 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onAdd, onEdit }) => 
   const [employees, setEmployees] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [localSearchData, setLocalSearchData] = useState<any[] | null>(null);
 
   // Pagination & Sorting State
   const [page, setPage] = useState(1);
@@ -40,6 +42,36 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onAdd, onEdit }) => 
   const fetchEmployees = async () => {
     try {
       setIsLoading(true);
+      
+      // Local Search & Sort logic if total records <= limit
+      if (localSearchData) {
+        let processed = [...localSearchData];
+        if (searchTerm) {
+          const lowerSearch = searchTerm.toLowerCase();
+          processed = processed.filter((emp: any) => 
+            emp.firstName?.toLowerCase().includes(lowerSearch) ||
+            emp.lastName?.toLowerCase().includes(lowerSearch) ||
+            emp.email?.toLowerCase().includes(lowerSearch) ||
+            emp.department?.toLowerCase().includes(lowerSearch) ||
+            emp.mobile?.toLowerCase().includes(lowerSearch)
+          );
+        }
+        if (sortBy) {
+          processed.sort((a, b) => {
+             const valA = (a[sortBy] || '').toString().toLowerCase();
+             const valB = (b[sortBy] || '').toString().toLowerCase();
+             if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+             if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+             return 0;
+          });
+        }
+        setEmployees(processed);
+        setTotalRecords(processed.length);
+        setTotalPages(1); // Local search is always 1 page
+        setIsLoading(false);
+        return;
+      }
+
       const params: any = { page, limit };
       if (searchTerm) params.search = searchTerm;
       if (sortBy) {
@@ -50,12 +82,28 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onAdd, onEdit }) => 
 
       const data = response?.data;
       if (data && data.success) {
-        setEmployees(data.result || []);
+        const resultData = Array.isArray(data.result) ? data.result : [];
+        setEmployees(resultData);
         setTotalPages(data.totalPages || 1);
+        setTotalRecords(data.total || 0);
+
+        // Build local search cache if records are <= limit
+        if (!searchTerm && data.total <= limit) {
+          setLocalSearchData(resultData);
+        } else if (data.total > limit) {
+          setLocalSearchData(null);
+        }
       } else {
         const fallbackData = response?.data?.data || response?.data || [];
-        if (Array.isArray(fallbackData)) {
-          setEmployees(fallbackData);
+        const resultData = Array.isArray(fallbackData) ? fallbackData : [];
+        setEmployees(resultData);
+        setTotalRecords(response?.data?.total || resultData.length);
+        setTotalPages(response?.data?.totalPages || 1);
+        
+        if (!searchTerm && (response?.data?.total || resultData.length) <= limit) {
+          setLocalSearchData(resultData);
+        } else if ((response?.data?.total || resultData.length) > limit) {
+          setLocalSearchData(null);
         }
       }
     } catch (error: any) {
@@ -87,6 +135,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onAdd, onEdit }) => 
       } else {
         toast.success(MESSAGES.LIST.DELETE_SUCCESS_FALLBACK);
       }
+      setLocalSearchData(null); // Clear local cache to force refresh from backend
       fetchEmployees();
     } catch (error: any) {
       if (error?.message) {
@@ -115,7 +164,12 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onAdd, onEdit }) => 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>{MESSAGES.LIST.TITLE}</h2>
+        <h2 className={styles.title}>
+          {MESSAGES.LIST.TITLE}
+          <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginLeft: '10px', fontWeight: 'normal' }}>
+            ({totalRecords} {totalRecords === 1 ? 'Record' : 'Records'})
+          </span>
+        </h2>
         <div className={styles.actions}>
           <div style={{ position: 'relative' }}>
             <Search size={18} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
@@ -157,7 +211,7 @@ export const EmployeeList: React.FC<EmployeeListProps> = ({ onAdd, onEdit }) => 
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
+            {isLoading && employees.length === 0 ? (
               <tr>
                 <td colSpan={6} className={styles.emptyState}>{MESSAGES.LIST.LOADING}</td>
               </tr>
